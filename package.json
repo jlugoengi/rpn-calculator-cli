@@ -1,0 +1,22 @@
+{
+  "name": "rpn-calculator-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bin/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jlugoengi/rpn-calculator-cli.git"
+  },
+  "author": "Jorge Lugo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jlugoengi/rpn-calculator-cli/issues"
+  },
+  "homepage": "https://github.com/jlugoengi/rpn-calculator-cli#readme",
+  "bin": {
+    "rpn-calculator-cli": "./bin/index.js"
+  }
+}
