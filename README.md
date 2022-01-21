@@ -53,6 +53,20 @@ Invalid input: Missing operant
 - clear - Set stack value to empty.
 - q - Exit the program.
 
+```
+
+user@ rpn-calculator-cli % node main.js
+> 5 5
+5
+> stack
+[ 5, 5 ]
+> clear
+> stack
+> []
+>
+
+```
+
 ## Unit Testing
 
 ```bash
