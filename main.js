@@ -1,6 +1,8 @@
 const readline = require("readline");
 const helpers = require("./utils/helpers");
 const calculations = require("./calculations");
+const { COMMANDS, ERRORS } = require("./constants/enums");
+const { GOODBYE, PROMPT, RPN_REGEX } = require("./constants/constants");
 
 var rl = readline.createInterface({
   input: process.stdin,
@@ -9,69 +11,73 @@ var rl = readline.createInterface({
 
 function rpnCalculator() {
   return new Promise(function (resolve, reject) {
-    rl.setPrompt("> ");
+    rl.setPrompt(PROMPT);
     rl.prompt();
 
     let stack = [];
-    let re = new RegExp(/^[0-9\+\-\*\-\/ ]*$/);
+    let re = new RegExp(RPN_REGEX);
 
     rl.on("line", function (line) {
       line = line.trim().replace(/\s+/g, " ").toLowerCase();
 
-      if (line == "exit" || line == "quit" || line == "q") {
+      if (COMMANDS.EXIT.includes(line)) {
         rl.close();
         return;
-      } else if (line === "help") {
+      } else if (line === COMMANDS.HELP) {
         console.log(`commands:\n  clear\n  stack\n  exit|quit|q`);
-      } else if (line === "clear") {
+      } else if (line === COMMANDS.CLEAR) {
         stack = [];
-      } else if (line === "stack") {
+      } else if (line === COMMANDS.STACK) {
         console.log(stack);
       } else if (!re.test(line)) {
-        console.log("Invalid input: Unknown operator");
+        console.log(ERRORS.UNKNOWN_OPERATOR);
       } else if (line !== "") {
-        let exp = line.split(" ");
-        let tempStack = helpers.deepClone(stack);
-        exp = exp.map((i) => {
-          if (i !== "0") return Number(i) ? Number(i) : i;
-          else return 0;
-        });
-
-        exp.forEach((op) => {
-          stack.push(
-            calculations[op] ? calculations[op](...stack.splice(-2)) : op
-          );
-        });
-
-        //validations
-        if (stack.some((n) => n === Infinity)) {
-          stack = tempStack;
-          console.log("Invalid input: Division by zero");
-        } else if (stack.some((n) => Number.isNaN(n))) {
-          stack = tempStack;
-          console.log("Invalid input: Missing operant");
-        } else if (stack.some((n) => !Number(n) && n !== 0)) {
-          console.log(stack);
-          stack = tempStack;
-          console.log("Syntax error");
-        } else {
-          !helpers.isEmptyArray(stack) && console.log(stack.slice(-1)[0]);
-        }
+        //rpnProcess(line);
       }
 
       rl.prompt();
     }).on("close", function () {
-      console.log("Goodbye!");
+      console.log(GOODBYE);
       resolve();
     });
   });
 }
 
+const rpnProcess = (line) => {
+  let exp = line.split(" ");
+  //safe copy
+  let tempStack = helpers.deepClone(stack);
+  exp = exp.map((i) => {
+    if (i !== "0") return Number(i) ? Number(i) : i;
+    else return 0;
+  });
+
+  //process stack
+  exp.forEach((op) => {
+    stack.push(calculations[op] ? calculations[op](...stack.splice(-2)) : op);
+  });
+
+  //validations
+  if (stack.some((n) => n === Infinity)) {
+    stack = tempStack;
+    console.log(ERRORS.INFINITY);
+  } else if (stack.some((n) => Number.isNaN(n))) {
+    stack = tempStack;
+    console.log(ERRORS.MISSING_OPERANT);
+  } else if (stack.some((n) => !Number(n) && n !== 0)) {
+    console.log(stack);
+    stack = tempStack;
+    console.log(ERRORS.SYNTAX);
+  } else {
+    !helpers.isEmptyArray(stack) && console.log(stack.slice(-1)[0]);
+  }
+};
+
 async function run() {
   try {
     await rpnCalculator();
   } catch (e) {
-    console.log("failed:", e);
+    console.log(ERRORS.GENERAL, e);
   }
 }
 
