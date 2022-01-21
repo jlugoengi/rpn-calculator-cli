@@ -36,7 +36,7 @@ function rpnCalculator() {
           console.log(stack);
           break;
         default:
-          rpnProcess(line, stack);
+          stack = rpnProcess(line, stack);
       }
       rl.prompt();
     }).on("close", function () {
@@ -50,12 +50,14 @@ const rpnProcess = (line, stack) => {
   //line validation
   if (!regex.test(line)) {
     console.log(ERRORS.UNKNOWN_OPERATOR);
-    return;
-  } else if (line === "") return;
+    return stack;
+  } else if (line === "") return stack;
 
-  let exp = line.split(" ");
   //safe copy
   let tempStack = helpers.deepClone(stack);
+
+  //proccess line
+  let exp = line.split(" ");
   exp = exp.map((i) => {
     if (i !== "0") return Number(i) ? Number(i) : i;
     else return 0;
@@ -66,7 +68,7 @@ const rpnProcess = (line, stack) => {
     stack.push(calculations[op] ? calculations[op](...stack.splice(-2)) : op);
   });
 
-  //validations
+  //stack validations
   if (stack.some((n) => n === Infinity)) {
     stack = tempStack;
     console.log(ERRORS.INFINITY);
@@ -74,12 +76,13 @@ const rpnProcess = (line, stack) => {
     stack = tempStack;
     console.log(ERRORS.MISSING_OPERANT);
   } else if (stack.some((n) => !Number(n) && n !== 0)) {
-    console.log(stack);
     stack = tempStack;
     console.log(ERRORS.SYNTAX);
   } else {
     !helpers.isEmptyArray(stack) && console.log(stack.slice(-1)[0]);
   }
+
+  return stack;
 };
 
 async function run() {
