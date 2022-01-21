@@ -8,7 +8,7 @@ var rl = readline.createInterface({
 });
 
 let stack = [];
-let re = new RegExp(/^[0-9\+\*\-4\/ ]*$/);
+let re = new RegExp(/^[0-9\+\*\-\/ ]*$/);
 
 var recursiveReadLine = function () {
   rl.question("> ", function (line) {
