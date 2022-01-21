@@ -4,37 +4,40 @@ const calculations = require("./calculations");
 const { COMMANDS, ERRORS } = require("./constants/enums");
 const { GOODBYE, PROMPT, RPN_REGEX } = require("./constants/constants");
 
-var rl = readline.createInterface({
+const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
+
+const regex = new RegExp(RPN_REGEX);
 
 function rpnCalculator() {
   return new Promise(function (resolve, reject) {
     rl.setPrompt(PROMPT);
     rl.prompt();
-
     let stack = [];
-    let re = new RegExp(RPN_REGEX);
 
     rl.on("line", function (line) {
       line = line.trim().replace(/\s+/g, " ").toLowerCase();
-
-      if (COMMANDS.EXIT.includes(line)) {
-        rl.close();
-        return;
-      } else if (line === COMMANDS.HELP) {
-        console.log(`commands:\n  clear\n  stack\n  exit|quit|q`);
-      } else if (line === COMMANDS.CLEAR) {
-        stack = [];
-      } else if (line === COMMANDS.STACK) {
-        console.log(stack);
-      } else if (!re.test(line)) {
-        console.log(ERRORS.UNKNOWN_OPERATOR);
-      } else if (line !== "") {
-        //rpnProcess(line);
+      switch (line) {
+        case COMMANDS.EXIT.value:
+          rl.close();
+          return;
+        case COMMANDS.HELP.value:
+          console.log(`Commands:`);
+          Object.values(COMMANDS).forEach((command) => {
+            console.log(`  ${command.value}: ${command.description}`);
+          });
+          break;
+        case COMMANDS.CLEAR.value:
+          stack = [];
+          break;
+        case COMMANDS.STACK.value:
+          console.log(stack);
+          break;
+        default:
+          rpnProcess(line, stack);
       }
-
       rl.prompt();
     }).on("close", function () {
       console.log(GOODBYE);
@@ -43,7 +46,13 @@ function rpnCalculator() {
   });
 }
 
-const rpnProcess = (line) => {
+const rpnProcess = (line, stack) => {
+  //line validation
+  if (!regex.test(line)) {
+    console.log(ERRORS.UNKNOWN_OPERATOR);
+    return;
+  } else if (line === "") return;
+
   let exp = line.split(" ");
   //safe copy
   let tempStack = helpers.deepClone(stack);

@@ -1,8 +1,8 @@
 const COMMANDS = Object.freeze({
-  HELP: "help",
-  CLEAR: "clear",
-  STACK: "stack",
-  EXIT: ["exit", "quit", "q"],
+  HELP: { value: "help", description: "Display program available commands." },
+  CLEAR: { value: "clear", description: "Set stack value to empty." },
+  STACK: { value: "stack", description: "Display current stack value." },
+  EXIT: { value: "q", description: "Exit the program." },
 });
 
 const ERRORS = Object.freeze({
