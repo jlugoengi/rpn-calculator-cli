@@ -1,6 +1,7 @@
 const helpers = require("./utils/helpers");
 const calculations = require("./utils/calculations");
 const { RPN_REGEX } = require("./constants/constants");
+const { ERRORS } = require("./constants/enums");
 
 const regex = new RegExp(RPN_REGEX);
 
